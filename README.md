@@ -41,7 +41,7 @@ Once you have Docker installed, you can download the repository and build the Do
 
 You should now use a text editor and edit the following two files:
 - docker-compose.yml: Set a (random) database password in the "POSTGRES_PASSWORD" line
-- .env-local: If the web server should be reachable under a certain URL (e.g. www.mytool.org), add this URL to the "DOMAIN_ALIASES" line
+- .env-local: If the web server should be reachable under a certain URL (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
 
 Then start the tool using the following command:
 ```bash
@@ -54,15 +54,21 @@ This will start two Docker containers, one for the database and one for the webs
 ```
 
 Once the tool is running and no more messages are printed to the console, you need to create a shell for creating a superuser and restoring the database. In order to create a shell inside the running virtual machine (docker) run:
-`docker exec -ti bewertungstool-bewertungstool_web-1 bash`
+```bash
+    docker exec -ti bewertungstool-bewertungstool_web-1 bash
+```
 
 Once you are inside of the shell, you need to create a [superuser](https://docs.djangoproject.com/en/4.2/intro/tutorial02/) to be able to access the djanto admin site, where you will be able to access and manage the database:
-`python manage.py createsuperuser`
+```bash
+    python manage.py createsuperuser
+```
 You will be asked to enter the desired username and password. 
-Once it is created, you will be able to access the database of your project using the [Django admin interface] (http://localhost:8998/admin).
+Once it is created, you will be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin).
 
 In order to load the set of questions into the database, you need to run (also inside the shell):
-`python manage.py dbrestore`
+```bash
+    python manage.py dbrestore
+```
 
 This command will fill up the following tables:
 - Lang/ Aku/ Ambu polls: where the questions for each setting are defined. 
@@ -89,7 +95,7 @@ Note that in order to fully be able to run this project, you need to set some va
 
 The Bewertungstool deliberately uses unencrypted HTTP and not HTTPS. For production use, we strongly recommend to run the Docker container behind a reverse proxy (e.g. based on Apache or NGINX) and use the reverse proxy to manage HTTPS and to provide certificates (e.g. using Let'sEncrypt).
 
-A sample `docker-compose.yml` script for such a setting is provided below. Note that the `port:` setting in the `bewertungstool_web` has been removed since the HTTP port is not exposed directly anymore, but routed through the reverse proxy, which uses the standard HTTPS port.
+A sample `docker-compose.yml` script for such a setting is provided below. Note that the `port:` setting in the `bewertungstool_web` section has been removed since the HTTP port is not exposed directly anymore, but routed through the reverse proxy, which uses the standard HTTPS port.
 
 ```yaml
 version: '3.5'
