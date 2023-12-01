@@ -26,6 +26,8 @@ If you are new to Django, you can get some [information](https://docs.djangoproj
 
 ---
 
+***Warning: These instructions are not complete yet. This warning will be removed once the tool can be installed following these instructions.***
+
 You need to have Docker installed on your system to run this project.
 - [Install Docker](https://docs.docker.com/engine/install/) here. 
 - If you have not used Docker in the past, please read this [introduction on Docker](https://docs.docker.com/get-started/) here.
@@ -39,7 +41,7 @@ Once you have Docker installed, you can download the repository and build the Do
 
 You should now use a text editor and edit the following two files:
 - docker-compose.yml: Set a (random) database password in the "POSTGRES_PASSWORD" line
-- .env-local: If the web server should be reachable under a certain URL (e.g. www.mytool.org), add this URL to the "DOMAIN_ALIASES" line
+- .env-local: If the web server should be reachable under a certain URL (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
 
 Then start the tool using the following command:
 ```bash
@@ -52,15 +54,21 @@ This will start two Docker containers, one for the database and one for the webs
 ```
 
 Once the tool is running and no more messages are printed to the console, you need to create a shell for creating a superuser and restoring the database. In order to create a shell inside the running virtual machine (docker) run:
-`docker exec -ti bewertungstool-bewertungstool_web-1 bash`
+```bash
+    docker exec -ti bewertungstool-bewertungstool_web-1 bash
+```
 
 Once you are inside of the shell, you need to create a [superuser](https://docs.djangoproject.com/en/4.2/intro/tutorial02/) to be able to access the djanto admin site, where you will be able to access and manage the database:
-`python manage.py createsuperuser`
+```bash
+    python manage.py createsuperuser
+```
 You will be asked to enter the desired username and password. 
-Once it is created, you will be able to access the database of your project below: `your_domain/admin`
+Once it is created, you will be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin).
 
-Like we said, we provide also the questions for the tool. So in order to load them into the database you need to run (also inside the shell):
-`python manage.py dbrestore`
+In order to load the set of questions into the database, you need to run (also inside the shell):
+```bash
+    python manage.py dbrestore
+```
 
 This command will fill up the following tables:
 - Lang/ Aku/ Ambu polls: where the questions for each setting are defined. 
@@ -83,6 +91,90 @@ Note that in order to fully be able to run this project, you need to set some va
 - You also need to establish your own path for `DATABASE_URL` and `DBBACKUP_STORAGE_OPTIONS` inside `settings.py`.
 - You need to define your own password for `POSTGRES_PASSWORD` inside `docker-compose.yml`. 
 
+### Security considerations
+
+The Bewertungstool deliberately uses unencrypted HTTP and not HTTPS. For production use, we strongly recommend to run the Docker container behind a reverse proxy (e.g. based on Apache or NGINX) and use the reverse proxy to manage HTTPS and to provide certificates (e.g. using Let'sEncrypt).
+
+A sample `docker-compose.yml` script for such a setting is provided below. Note that the `port:` setting in the `bewertungstool_web` section has been removed since the HTTP port is not exposed directly anymore, but routed through the reverse proxy, which uses the standard HTTPS port.
+
+```yaml
+version: '3.5'
+
+services:
+
+  reverse_proxy:
+    image: nginx:1.19
+    container_name: reverse
+    hostname: reverse
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - internal
+    volumes:
+      - /export/nginx/config:/etc/nginx
+      - /export/nginx/log:/var/log/nginx
+      - /export/certbot/conf:/etc/letsencrypt
+      - /export/certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  bewertungstool_web:
+    image: bewertungstool_web
+    hostname: bewertungstool_web
+    build: .
+    depends_on:
+      database_default:
+        condition: service_started
+    volumes:
+      - "./data:/data:rw"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd /app
+        sleep 15
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py runserver 0.0.0.0:80
+    networks:
+      - internal
+    env_file: ./.env-local
+
+  database_default:
+    image: postgres:9.6-alpine
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_PASSWORD: "your_password"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+      SERVICE_MANAGER: "fsm-postgres"
+    networks:
+      - internal
+    volumes:
+      - "./postgres-data:/var/lib/postgresql/data:rw"
+
+networks:
+  internal:
+```
+
+This is a sample configuration file for NGINX as a reverse proxy.
+
+```nginx
+upstream bewertungstool {
+  server        bewertungstool_web:80;
+}
+
+server {
+  listen        443 ssl;
+  server_name   bewertungtool.mydomain.de;
+  include       /etc/nginx/common.conf;
+  include       /etc/nginx/ssl.conf;
+  location / {
+    proxy_pass  http://bewertungstool_web;
+    include     /etc/nginx/common_location.conf;
+  }
+}
+```
+
 ## Acknowledgements
 
 ---
@@ -90,9 +182,4 @@ Note that in order to fully be able to run this project, you need to set some va
 This work was funded by the German Federal Ministry of Education and Research as part of the BeBeRobot project (grant no. 16SV8342)
 [OFFIS - Institute for Information Technology](https://www.offis.de/) was in charge of developing and reviewing the source code. 
 [University of Osnabrück](https://www.igb.uni-osnabrueck.de/abteilungen/pflegewissenschaft.html), [SIBIS Institute for Social and Technical Research GmbH](http://www.sibis-institut.de/), [University of Siegen](https://forschung.uni-siegen.de/) and [German Caritas Association e.V., Freiburg](https://www.caritas.de/diecaritas/deutschercaritasverband/verbandszentrale/standorte/dcv-zentrale-freiburg) developed the content of the tool (e.g. questions and help text). 
-
-
-
-
-
 
