@@ -11,6 +11,9 @@ services:
         condition: service_started
     volumes:
       - "./data:/data:rw"
+      - "./backup:/app/backup"
+    ports:
+      - "8998:80"
     command:
       - /bin/sh
       - -c
