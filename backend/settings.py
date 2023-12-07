@@ -106,6 +106,7 @@ INSTALLED_APPS = [
 
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': '/app/backup'}
+DBBACKUP_FILENAME_TEMPLATE = '{datetime}-{databasename}-{servername}.{extension}'
 
 CRISPY_TEMPLATE_PACK = 'uni_form'
 
