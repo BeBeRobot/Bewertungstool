@@ -11,7 +11,7 @@ services:
         condition: service_started
     volumes:
       - "./data:/data:rw"
-      #- "./backup:/app/backup"
+      - "./backup:/app/backup"
     ports:
       - "8998:80"
     command:
@@ -31,7 +31,7 @@ services:
     image: postgres:9.6-alpine
     environment:
       POSTGRES_DB: "db"
-      POSTGRES_PASSWORD: "your_password" 
+      POSTGRES_PASSWORD: "kM9vCN3C" 
       POSTGRES_HOST_AUTH_METHOD: "trust"
       SERVICE_MANAGER: "fsm-postgres"
     networks:

@@ -53,19 +53,12 @@ This will start two Docker containers, one for the database and one for the webs
     docker compose up -d
 ```
 
-Once the tool is running and no more messages are printed to the console, you need to create a shell for creating a superuser and restoring the database. In order to create a shell inside the running virtual machine (docker) run:
+Once the tool is running and no more messages are printed to the console, you need to create a shell for restoring the database. In order to create a shell inside the running virtual machine (docker) run:
 ```bash
     docker exec -ti bewertungstool-bewertungstool_web-1 bash
 ```
 
-Once you are inside of the shell, you need to create a [superuser](https://docs.djangoproject.com/en/4.2/intro/tutorial02/) to be able to access the djanto admin site, where you will be able to access and manage the database:
-```bash
-    python manage.py createsuperuser
-```
-You will be asked to enter the desired username and password. 
-Once it is created, you will be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin).
-
-In order to load the set of questions into the database, you need to run (also inside the shell):
+In order to load the set of questions into the database, you need to run :
 ```bash
     python manage.py dbrestore
 ```
@@ -75,21 +68,29 @@ This command will fill up the following tables:
 - Lang/ Aku/ Ambu mouses: where the Mouse over text of each question is defined. 
 - Roles Lang/ Aku/ Ambu: where the roles of each setting are defined. 
 
-**Note:** Creation of the superuser and restorage of the database is only needed the first time that you are building up the tool. Once they are created, you don't need to use a shell again. 
+Once it is created, you will be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin) and the following data: 
+
+- Username: admin
+- Password: BeBeRobot$DefaultPassword123
+
+Because we are providing a default password, we strongly recommend changing it, after login one time on the admin site and proving that the mentioned tables were filled. In order to do so, just run (also inside the shell): 
+```bash
+    python manage.py changepassword admin
+```
+
+**Note:** The restorage of the database is only needed the first time that you are building up the tool. Once they are created, you don't need to use a shell again. 
 
 **Note2:** If you do any modification to the "models.py" file. You would need to restart the docker in order to load them:
 `docker restart bewertungstool_web`
 
 ### Deployment
 
-Note that in order to fully be able to run this project, you need to set some variables to your desired values. 
+Note that in order to fully be able to run this project, you need to set some variables to your desired values inside `settings.py`. 
 
 #### Env variables
 - To deploy this project in testing mode (recommended) set the environment variable `DEBUG` to `True` in your hosting environment.
 - For production environment (if `DEBUG` is false) django requires you to whitelist the domain. Set the env var `DOMAIN` to the host, i.e. `www.domain.com` or `*.domain.com`.
-- For configurating the sending of Emails you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD` inside `settings.py`.
-- You also need to establish your own path for `DATABASE_URL` and `DBBACKUP_STORAGE_OPTIONS` inside `settings.py`.
-- You need to define your own password for `POSTGRES_PASSWORD` inside `docker-compose.yml`. 
+- For configurating the sending of Emails you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`.
 
 ### Security considerations
 
