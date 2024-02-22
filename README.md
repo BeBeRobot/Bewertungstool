@@ -1,11 +1,11 @@
-# Bewertungstool 
+# Bewertungstool
 
 ## Overview
 
 ---
 
 Welcome to the Evaluation tool (Bewertungstool), developed by the R&D project [BeBeRobot](https://www.interaktive-technologien.de/projekte/beberobot).
-This tool is designed to help organisations inside of a care environment to evaluate and decide if robotic systems can be a good tool for their application. 
+This tool is designed to help organisations inside of a care environment to evaluate and decide if robotic systems can be a good tool for their application.
 The tool offers a Web interface and is designed to run in a Docker container on a Linux host. We have not tested deployment on Windows, which may or may not work.
 The tool is designed to be used as part of an interactive workshop, where the moderator is in charge of controlling the web interface and navigates it.
 
@@ -14,13 +14,13 @@ The tool allows for the creation of different user accounts, and multple worksho
 - Hospital
 - Care for the elderly (outpatient) or care for the disabled (outpatient)
 
-For each of these scenarios, we provide a list with all the possible participants and the questions that will make the evaluation possible. 
-The questions are sorted in six categories (care, technology & infrastructure, institutional & social embedding, Privacy & Law, ethics and economy). 
-Each category has a maximum of 8 questions, but it is possible to extend this list. 
-After all the questions are answered, the moderator of the workshop receives a PDF Report with the results of the discussion. 
+For each of these scenarios, we provide a list with all the possible participants and the questions that will make the evaluation possible.
+The questions are sorted in six categories (care, technology & infrastructure, institutional & social embedding, Privacy & Law, ethics and economy).
+Each category has a maximum of 8 questions, but it is possible to extend this list.
+After all the questions are answered, the moderator of the workshop receives a PDF Report with the results of the discussion.
 
-This app was developed based on Django and the Django CMS packages. 
-If you are new to Django, you can get some [information](https://docs.djangoproject.com/en/4.2/) here. 
+This app was developed based on Django and the Django CMS packages.
+If you are new to Django, you can get some [information](https://docs.djangoproject.com/en/4.2/) here.
 
 ## Installation
 
@@ -29,7 +29,7 @@ If you are new to Django, you can get some [information](https://docs.djangoproj
 ***Warning: These instructions are not complete yet. This warning will be removed once the tool can be installed following these instructions.***
 
 You need to have Docker installed on your system to run this project.
-- [Install Docker](https://docs.docker.com/engine/install/) here. 
+- [Install Docker](https://docs.docker.com/engine/install/) here.
 - If you have not used Docker in the past, please read this [introduction on Docker](https://docs.docker.com/get-started/) here.
 
 Once you have Docker installed, you can download the repository and build the Docker image with:
@@ -41,7 +41,9 @@ Once you have Docker installed, you can download the repository and build the Do
 
 You should now use a text editor and edit the following two files:
 - docker-compose.yml: Set a (random) database password in the "POSTGRES_PASSWORD" line
-- .env-local: If the web server should be reachable under a certain URL (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
+- .env-local:
+  - In the "DATABASE_URL" line, replace "your_password" with the same database password as used in docker-compose.yml
+  - If the web server should be reachable under a certain URL (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
 
 Then start the tool using the following command:
 ```bash
@@ -63,34 +65,39 @@ In order to load the set of questions into the database, you need to run :
     python manage.py dbrestore
 ```
 
-This command will fill up the following tables:
-- Lang/ Aku/ Ambu polls: where the questions for each setting are defined. 
-- Lang/ Aku/ Ambu mouses: where the Mouse over text of each question is defined. 
-- Roles Lang/ Aku/ Ambu: where the roles of each setting are defined. 
+This command will populate the following SQL tables:
+- Lang/ Aku/ Ambu polls: the questions for each care setting
+- Lang/ Aku/ Ambu mouses: the tooltips for each question
+- Roles Lang/ Aku/ Ambu: the user roles of each care setting
 
-Once it is created, you will be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin) and the following data: 
+You will now be able to access the database of your project using the [Django admin interface](http://localhost:8998/admin) and the following data:
 
 - Username: admin
 - Password: BeBeRobot$DefaultPassword123
 
-Because we are providing a default password, we strongly recommend changing it, after login one time on the admin site and proving that the mentioned tables were filled. In order to do so, just run (also inside the shell): 
+Since we are providing a default password, we strongly recommend changing it, after login one time on the admin site and proving that the mentioned tables were filled. In order to do so, just run (also inside the shell):
 ```bash
     python manage.py changepassword admin
 ```
 
-**Note:** The restorage of the database is only needed the first time that you are building up the tool. Once they are created, you don't need to use a shell again. 
++After this step, you can exit the shell in the Docker container:
++```bash
++    exit
++```
 
-**Note2:** If you do any modification to the "models.py" file. You would need to restart the docker in order to load them:
-`docker restart bewertungstool_web`
+**Note 1:** Restoring the database is only needed the first time that you are setting up the tool. After that, you don't need to use a shell again.
+**Note 2:** If you ever modify the "models.py" file you need to restart the docker contained in order to load the modified models:
+```bash
+    docker restart bewertungstool_web
+```
 
 ### Deployment
 
-Note that in order to fully be able to run this project, you need to set some variables to your desired values inside `settings.py`. 
+In order to be fully able to run this project, you need to set some variables to your desired values inside `Bewertungstool/backend/settings.py`:
 
-#### Env variables
-- To deploy this project in testing mode (recommended) set the environment variable `DEBUG` to `True` in your hosting environment.
-- For production environment (if `DEBUG` is false) django requires you to whitelist the domain. Set the env var `DOMAIN` to the host, i.e. `www.domain.com` or `*.domain.com`.
-- For configurating the sending of Emails you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`.
+- To deploy this project in testing mode (recommended as a first step), set the variable `DEBUG` to `True`.
+- To deploy this project in production mode (`DEBUG` set to false), Django requires you to whitelist the domain. Set the variable `ALLOWED_HOSTS` to the host, i.e. `www.domain.com` or `*.domain.com`.
+- In order to enable the tool to send e-mails, you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`.
 
 ### Security considerations
 
@@ -181,6 +188,6 @@ server {
 ---
 
 This work was funded by the German Federal Ministry of Education and Research as part of the BeBeRobot project (grant no. 16SV8342)
-[OFFIS - Institute for Information Technology](https://www.offis.de/) was in charge of developing and reviewing the source code. 
-[University of Osnabrück](https://www.igb.uni-osnabrueck.de/abteilungen/pflegewissenschaft.html), [SIBIS Institute for Social and Technical Research GmbH](http://www.sibis-institut.de/), [University of Siegen](https://forschung.uni-siegen.de/) and [German Caritas Association e.V., Freiburg](https://www.caritas.de/diecaritas/deutschercaritasverband/verbandszentrale/standorte/dcv-zentrale-freiburg) developed the content of the tool (e.g. questions and help text). 
+[OFFIS - Institute for Information Technology](https://www.offis.de/) was in charge of developing and reviewing the source code.
+[University of Osnabrück](https://www.igb.uni-osnabrueck.de/abteilungen/pflegewissenschaft.html), [SIBIS Institute for Social and Technical Research GmbH](http://www.sibis-institut.de/), [University of Siegen](https://forschung.uni-siegen.de/) and [German Caritas Association e.V., Freiburg](https://www.caritas.de/diecaritas/deutschercaritasverband/verbandszentrale/standorte/dcv-zentrale-freiburg) developed the content of the tool (e.g. questions and help text).
 
