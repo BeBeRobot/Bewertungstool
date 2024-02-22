@@ -12,19 +12,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', '<a string of random characters>')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-#DEBUG = os.environ.get('DEBUG') == "False"
-DEBUG="True"
+DEBUG = os.environ.get('DEBUG') == "False"
 ALLOWED_HOSTS = ["*",]
 
-#ALLOWED_HOSTS = [os.environ.get('DOMAIN'),]
+ALLOWED_HOSTS = [os.environ.get('DOMAIN'),]
 #This is very risky. Running under your own risk
-#if DEBUG:
-ALLOWED_HOSTS = ["*"]
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
 
 # Redirect to HTTPS by default, unless explicitly disabled
-# SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT') != "False"
-# For debugging
-SECURE_SSL_REDIRECT = "False" != "False"
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT') != "False"
 
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
@@ -33,7 +30,7 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'your email host'
 EMAIL_HOST_USER = 'your host user'
-EMAIL_HOST_PASSWORD = 'your password!' # Stablish the app password we have to generate on the email account
+EMAIL_HOST_PASSWORD = 'your password' # Stablish the app password we have to generate on the email account
 EMAIL_PORT = 587
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER

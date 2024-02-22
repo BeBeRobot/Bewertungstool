@@ -29,6 +29,8 @@ from .tokens import account_activation_token
 
 from django.contrib.sessions.backends.db import SessionStore
 
+from django.conf import settings
+
 import datetime
 
 # Generation PDF file
@@ -219,32 +221,34 @@ def delete_user(request):
 
 
 def password_reset_request(request):
-	if request.method == "POST":
-		password_reset_form = PasswordResetForm(request.POST)
-		if password_reset_form.is_valid():
-			data = password_reset_form.cleaned_data['email']
-			associated_users = User.objects.filter(email=data) 
-			if associated_users.exists():
-				for user in associated_users:
-					subject = "Passwortrücksetzung angefordert"
-					email_template_name = "password/password_reset_email.txt"
-					c = {
-					"email":user.email,
-					'domain':'localhost:8000',
-					'site_name': 'Website',
-					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
-					"user": user,
-					'token': default_token_generator.make_token(user),
-					'protocol': 'http',
-					}
-					email = render_to_string(email_template_name, c)
-					try:
-						send_mail(subject, email, 'pflegeundrobotik@gmx.de' , [user.email], fail_silently=False)
-					except BadHeaderError:
-						return HttpResponse('Ungültiger Header gefunden.')
-					return redirect ("/password_reset/done/")
-	password_reset_form = PasswordResetForm()
-	return render(request=request, template_name="password/password_reset.html", context={"password_reset_form":password_reset_form})
+    current_site = get_current_site(request)
+    
+    if request.method == "POST":
+        password_reset_form = PasswordResetForm(request.POST)
+        if password_reset_form.is_valid():
+            data = password_reset_form.cleaned_data['email']
+            associated_users = User.objects.filter(email=data)
+            if associated_users.exists():
+                for user in associated_users:
+                    subject = "Passwortrücksetzung angefordert"
+                    email_template_name = "password/password_reset_email.txt"
+                    c = {
+                    "email":user.email,
+                    'domain':current_site.domain,
+                    'site_name': 'Website',
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "user": user,
+                    'token': default_token_generator.make_token(user),
+                    'protocol': 'http',
+                    }
+                    email = render_to_string(email_template_name, c)
+                    try:
+                        send_mail(subject, email, settings.EMAIL_HOST_USER , [user.email], fail_silently=False)
+                    except BadHeaderError:
+                        return HttpResponse('Ungültiger Header gefunden.')
+                    return redirect ("/password_reset/done/")
+    password_reset_form = PasswordResetForm()
+    return render(request=request, template_name="password/password_reset.html", context={"password_reset_form":password_reset_form})
 
 @login_required(login_url='polls:login_user')
 def list_workshop(request): # Get the workshops associated with the logged in user
