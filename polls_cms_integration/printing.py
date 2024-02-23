@@ -63,18 +63,18 @@ class QuickPieChart02(_DrawingEditorMixin,Drawing):
 
         elif selected_setting.setting == "akutstationär":
             care = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "care")
-            technology = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "technology")
-            embedding = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "embedding")
-            law = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "law")
-            ethics = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "ethics")
-            economy = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "economy")
+            technology = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "technology")
+            embedding = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "embedding")
+            law = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "law")
+            ethics = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "ethics")
+            economy = AkuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "economy")
         else: 
             care = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "care")
-            technology = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "technology")
-            embedding = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "embedding")
-            law = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "law")
-            ethics = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "ethics")
-            economy = LangPoll_Answer.objects.filter(workshop_id=workshop_id, category = "economy")
+            technology = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "technology")
+            embedding = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "embedding")
+            law = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "law")
+            ethics = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "ethics")
+            economy = AmbuPoll_Answer.objects.filter(workshop_id=workshop_id, category = "economy")
 
         # Calculate the result for each category: ja = 1 point, ja_aber = 0.5, nein = 0. The maximum value for each category is the number of answered questions
         care_total = care.count()
@@ -92,7 +92,6 @@ class QuickPieChart02(_DrawingEditorMixin,Drawing):
         economy_points = 0
 
         for care_question in care:
-            print("CARE CHOICE: ", care_question.choice, flush=True)
             if care_question.choice == "Ja":
                 care_points += 1 
             elif care_question.choice == "Ja_aber":
