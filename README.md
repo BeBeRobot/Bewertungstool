@@ -98,6 +98,7 @@ In order to be fully able to run this project, you need to set some variables to
 - To deploy this project in testing mode (recommended as a first step), set the variable `DEBUG` to `True`.
 - To deploy this project in production mode (`DEBUG` set to false), Django requires you to whitelist the domain. Set the variable `ALLOWED_HOSTS` to the host, i.e. `www.domain.com` or `*.domain.com`.
 - In order to enable the tool to send e-mails, you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER` and `EMAIL_HOST_PASSWORD`.
+- By default django-admin startproject adds a randomly-generated `SECRET_KEY`  to each new project. But if you want to define your own `SECRET_KEY`, you can define it inside `.env-local`. More information about `SECRET_KEY` and its use can be found [here](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key).
 
 ### Security considerations
 
