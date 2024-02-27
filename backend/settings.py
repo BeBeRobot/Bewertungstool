@@ -12,11 +12,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', '<a string of random characters>')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG') == "False"
+DEBUG = os.environ.get('DEBUG', "False") == "True"
 ALLOWED_HOSTS = ["*",]
 
-ALLOWED_HOSTS = [os.environ.get('DOMAIN'),]
 #This is very risky. Running under your own risk
+ALLOWED_HOSTS = [os.environ.get('DOMAIN'), "*"]
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
 
@@ -26,12 +26,12 @@ SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT') != "False"
 X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # Email configuration
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # comment when we have it on the server and we are using a real email
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'your email host'
-EMAIL_HOST_USER = 'your host user'
-EMAIL_HOST_PASSWORD = 'your password' # Stablish the app password we have to generate on the email account
-EMAIL_PORT = 587
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' # comment it when you have it on the server and you are using a real email
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', "True") == "True"
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'email_host_is_undefined')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'email_user_is_undefined')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'email_password_is_undefined') 
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587)) 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 SERVER_EMAIL = EMAIL_HOST_USER
 
