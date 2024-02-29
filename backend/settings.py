@@ -16,7 +16,7 @@ DEBUG = os.environ.get('DEBUG', "False") == "True"
 ALLOWED_HOSTS = ["*",]
 
 #This is very risky. Running under your own risk
-ALLOWED_HOSTS = [os.environ.get('DOMAIN'), "*"]
+ALLOWED_HOSTS = [os.environ.get('DOMAIN'),]
 if DEBUG:
     ALLOWED_HOSTS = ["*"]
 
