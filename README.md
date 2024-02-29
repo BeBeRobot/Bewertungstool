@@ -96,7 +96,7 @@ Since we are providing a default password, we strongly recommend changing it, af
 In order to be fully able to run this project, you need to set some variables to your desired values inside `Bewertungstool/.env-local`:
 
 - To deploy this project in testing mode (recommended as a first step), set the variable `DEBUG` to `True`.
-- To deploy this project in production mode (`DEBUG` set to false), Django requires you to whitelist the domain. Set the variable `ALLOWED_HOSTS` to the host, i.e. `www.domain.com` or `*.domain.com`.
+- To deploy this project in production mode (`DEBUG` set to false), Django requires you to whitelist the domain. Set the variable `DOMAIN` to the host, i.e. `www.domain.com` or `*.domain.com`. If your page has different domain aliases you can also define them under the variable `DOMAIN_ALIASES`.
 - In order to enable the tool to send e-mails, you need to define your `EMAIL_HOST`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD` and, if different from 587, also your `EMAIL_PORT`.
 - By default django-admin startproject adds a randomly-generated `SECRET_KEY`  to each new project. But if you want to define your own `SECRET_KEY`. More information about `SECRET_KEY` and its use can be found [here](https://docs.djangoproject.com/en/dev/ref/settings/#secret-key).
 
