@@ -25,12 +25,13 @@
         </div>
         
         <br /><br />
-        <a class="button_brown" href="{% url 'polls:register' %}" role="button">Registrieren</a>
+        <a class="button_brown" href="{% url 'polls:register' %}" role="button" id="register_button">Registrieren</a>
         <input id="anmelden_button" type="submit" value="Anmelden" class="button"/>
         <br /><br />
         <a class="button_red" href="{% url 'polls:show_delete_user' %}" role="button">Benutzer löschen</a>
         <br />
-
+        <input type="hidden" id="email_host_var" name="email_host_var" value="{{email_host}}">
+        
         <div class="form-group">
             {% for message in messages %}
             <div class="alert alert-danger" role="alert">

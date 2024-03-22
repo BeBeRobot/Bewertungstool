@@ -32,6 +32,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 
 import datetime
+import os
 
 # Generation PDF file
 from reportlab.pdfgen import canvas
@@ -49,75 +50,78 @@ def IndexView(request):
     return render(request, 'polls/welcome.html')
 
 def register(request):
-    # Get the values of all the fields
-    if request.method == 'POST':
-        last_name = request.POST['last_name'] # We have only one field for the name, where both first and last name are written 
-        username = request.POST['username']
-        email = request.POST['email']
-        password = request.POST['password']
-        confirm_password = request.POST['confirm_password']
+    if (settings.EMAIL_HOST == "your_email_host.com") or (settings.EMAIL_HOST == "") or (settings.EMAIL_HOST == " ") or (os.environ.get('REGISTRATION_DISABLED') == "True"):
+        return redirect('polls:login_user')
+    else:
+        # Get the values of all the fields
+        if request.method == 'POST':
+            last_name = request.POST['last_name'] # We have only one field for the name, where both first and last name are written 
+            username = request.POST['username']
+            email = request.POST['email']
+            password = request.POST['password']
+            confirm_password = request.POST['confirm_password']
 
-        context = {}
+            context = {}
 
-        # Check if the passwords match and then if the user or email already exit
-        if password==confirm_password:
-            if User.objects.filter(username=username).exists():
-                context["last_name"] = last_name
-                context["email"] = email
-                context["password"] = password
-                messages.info(request, 'Benutzername ist bereits vergeben')
-                return render(request, 'polls/registration.html', context)
+            # Check if the passwords match and then if the user or email already exit
+            if password==confirm_password:
+                if User.objects.filter(username=username).exists():
+                    context["last_name"] = last_name
+                    context["email"] = email
+                    context["password"] = password
+                    messages.info(request, 'Benutzername ist bereits vergeben')
+                    return render(request, 'polls/registration.html', context)
 
-            elif User.objects.filter(email=email).exists():
-                context["last_name"] = last_name
-                context["username"] = username
-                context["password"] = password
-                messages.info(request, 'E-Mail ist bereits vergeben')
-                return render(request, 'polls/registration.html', context)
-
-            else: # If everything is new we create and save the new user
-                try:
-                    validate_password(password)
-                    print ("VALID PASSWORD", flush=True)
-                    user = User.objects.create_user(username=username, password=password, 
-                                            email=email, last_name=last_name) 
-                    user.is_active = False # Deactivate account till it is confirmed
-                    user.save()
-
-                    current_site = get_current_site(request)
-                    subject = 'Activate Your Ready? Account'
-                    message = render_to_string('confirmation_email/account_activation_email.html', {
-                        'user': user,
-                        'domain': current_site.domain,
-                        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                        'token': account_activation_token.make_token(user),
-                    })
-
-                    email_conf = EmailMessage(
-                        subject, message, to=[email]
-                    )
-
-                    email_conf.send()
-                    return redirect ("/email_sent/")
-                    
-                except ValidationError as e:
-                    messages.error(request, str(e))
+                elif User.objects.filter(email=email).exists():
                     context["last_name"] = last_name
                     context["username"] = username
-                    context["email"] = email
+                    context["password"] = password
+                    messages.info(request, 'E-Mail ist bereits vergeben')
                     return render(request, 'polls/registration.html', context)
-                    
-                
-        else:
-            context["last_name"] = last_name
-            context["username"] = username
-            context["email"] = email
-            messages.info(request, 'Beide Passwörter stimmen nicht überein')
-            return render(request, 'polls/registration.html', context)
-            
 
-    else:
-        return render(request, 'polls/registration.html')
+                else: # If everything is new we create and save the new user
+                    try:
+                        validate_password(password)
+                        print ("VALID PASSWORD", flush=True)
+                        user = User.objects.create_user(username=username, password=password, 
+                                                email=email, last_name=last_name) 
+                        user.is_active = False # Deactivate account till it is confirmed
+                        user.save()
+
+                        current_site = get_current_site(request)
+                        subject = 'Activate Your Ready? Account'
+                        message = render_to_string('confirmation_email/account_activation_email.html', {
+                            'user': user,
+                            'domain': current_site.domain,
+                            'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                            'token': account_activation_token.make_token(user),
+                        })
+
+                        email_conf = EmailMessage(
+                            subject, message, to=[email]
+                        )
+
+                        email_conf.send()
+                        return redirect ("/email_sent/")
+                        
+                    except ValidationError as e:
+                        messages.error(request, str(e))
+                        context["last_name"] = last_name
+                        context["username"] = username
+                        context["email"] = email
+                        return render(request, 'polls/registration.html', context)
+                        
+                    
+            else:
+                context["last_name"] = last_name
+                context["username"] = username
+                context["email"] = email
+                messages.info(request, 'Beide Passwörter stimmen nicht überein')
+                return render(request, 'polls/registration.html', context)
+                
+
+        else:
+            return render(request, 'polls/registration.html')
 
 def activate(request, uidb64, token):
     try:
@@ -151,7 +155,14 @@ def login_user(request):
             messages.info(request, 'Ungültiger Benutzername oder Passwort')
             return redirect('polls:login_user')
     else:
-        return render(request, 'polls/login.html')
+        if (settings.EMAIL_HOST == "your_email_host.com") or (settings.EMAIL_HOST == "") or (settings.EMAIL_HOST == " ") or (os.environ.get('REGISTRATION_DISABLED') == "True"):
+            email_host = "False"
+        else:
+            email_host = "True"
+
+        return render(request, 'polls/login.html', {
+            "email_host": email_host
+        })
 
 def logout_user(request):
     auth.logout(request)
