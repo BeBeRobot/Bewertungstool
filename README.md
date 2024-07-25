@@ -26,8 +26,6 @@ If you are new to Django, you can get some [information](https://docs.djangoproj
 
 ---
 
-***Warning: These instructions are not complete yet. This warning will be removed once the tool can be installed following these instructions.***
-
 You need to have Docker installed on your system to run this project.
 - [Install Docker](https://docs.docker.com/engine/install/) here.
 - If you have not used Docker in the past, please read this [introduction on Docker](https://docs.docker.com/get-started/) here.
@@ -43,7 +41,7 @@ You should now use a text editor and edit the following two files:
 - docker-compose.yml: Set a (random) database password in the "POSTGRES_PASSWORD" line
 - .env-local:
   - In the "DATABASE_URL" line, replace "your_password" with the same database password as used in docker-compose.yml
-  - If the web server should be reachable under a certain URL (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
+  - If the web server should be reachable under a certain domain name (e.g. bewertungtool.mydomain.de), add this URL to the "DOMAIN_ALIASES" line
 
 Then start the tool using the following command:
 ```bash
@@ -55,7 +53,7 @@ This will start two Docker containers, one for the database and one for the webs
     docker compose up -d
 ```
 
-Once the tool is running and no more messages are printed to the console, you need to create a shell for restoring the database. In order to create a shell inside the running virtual machine (docker) run:
+Once the tool is running and no more messages are printed to the console, you need to open a shell to initialize and populate the database. In order to create a shell inside the running virtual machine (docker) run:
 ```bash
     docker exec -ti bewertungstool-bewertungstool_web-1 bash
 ```
@@ -81,9 +79,9 @@ Since we are providing a default password, we strongly recommend changing it, af
 ```
 
 +After this step, you can exit the shell in the Docker container:
-+```bash
-+    exit
-+```
+```bash
+    exit
+```
 
 **Note 1:** Restoring the database is only needed the first time that you are setting up the tool. After that, you don't need to use a shell again.
 **Note 2:** If you ever modify the "models.py" file you need to restart the docker contained in order to load the modified models:
