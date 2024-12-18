@@ -54,13 +54,13 @@ document.addEventListener('DOMContentLoaded', function() {
             var lang_box6 = document.getElementById('Lang6');
             var lang_box7 = document.getElementById('Lang7');
             var lang_box8 = document.getElementById('Lang8');
+            var lang_box12 = document.getElementById('Lang12');
             var lang_box13 = document.getElementById('Lang13');
             var lang_box14 = document.getElementById('Lang14');
             var lang_box15 = document.getElementById('Lang15');
-            var lang_box16 = document.getElementById('Lang16');
 
             // If the mandatory boxes are selected we can move to the next page 
-            if (lang_box3.checked && lang_box6.checked && lang_box7.checked && lang_box8.checked && lang_box13.checked && lang_box14.checked && lang_box15.checked && lang_box16.checked){
+            if (lang_box3.checked && lang_box6.checked && lang_box7.checked && lang_box8.checked && lang_box12.checked && lang_box13.checked && lang_box14.checked && lang_box15.checked){
                 return true;
             } else { // If not selected then we alert the user and give the option to return to the page or continue incompleate
                 if (confirm("Sie haben nicht alle vom Anbieter als erforderlich eingestuften Teilnehmenden ausgewählt. Möchten Sie dennoch fortfahren?") == true) {
